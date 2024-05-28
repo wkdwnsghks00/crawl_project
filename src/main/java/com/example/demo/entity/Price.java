@@ -11,6 +11,7 @@ public class Price {
     private int coupon_price;
     private String discount_rate;
     private LocalDateTime crawl_time;
+    private String delivery;
     private int product_id;
 
 }

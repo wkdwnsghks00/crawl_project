@@ -30,7 +30,7 @@ cursor = conn.cursor()
 
 # HTTP 요청 헤더
 headers = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Whale/3.26.244.14 Safari/537.36",
     "Accept-Language": "ko-KR,ko;q=0.8,en-US;q=0.5,en;q=0.3"
 }
 
@@ -122,6 +122,45 @@ def crawl_product_data(url):
         now = datetime.datetime.now()
         crawl_time = now.strftime("%Y-%m-%d %H:%M:%S") # 현재 시간을 포맷에 맞추어 문자열로 변환
 
+        # 별점 추출
+        rating_element = soup.select_one(".rating-star-num")
+        if rating_element:
+            width_style = rating_element.get('style', '')
+            width_percentage = float(width_style.replace('width: ', '').replace('%;', ''))
+
+            # 별점 변환
+            if width_percentage == 100.0:
+                rating = 5.0
+            elif width_percentage == 90.0:
+                rating = 4.5
+            elif width_percentage == 80.0:
+                rating = 4.0
+            elif width_percentage == 70.0:
+                rating = 3.5
+            elif width_percentage == 60.0:
+                rating = 3.0
+            elif width_percentage == 50.0:
+                rating = 2.5
+            elif width_percentage == 40.0:
+                rating = 2.0
+            elif width_percentage == 30.0:
+                rating = 1.5
+            elif width_percentage == 20.0:
+                rating = 1.0
+            elif width_percentage == 10.0:
+                rating = 0.5
+            else:
+                rating = "-"
+        else:
+            rating = "-"
+
+        #배송정보
+        delivery = soup.select_one(".prod-txt-onyx.prod-txt-green-2")
+        if delivery is None:
+            delivery = soup.select_one(".prod-txt-onyx.prod-txt-green-normal")
+        delivery = "-" if not delivery else delivery.text.strip()
+
+
         # 옵션 정보
         option = soup.select(".prod-option__item")
         if option:
@@ -144,13 +183,15 @@ def crawl_product_data(url):
             'title': title,
             'option': option,
             'description': description,
+            'rating': rating,
             'img_url': img_url,
             'url': url,
             'origin_price': origin_price,
             'sale_price': sale_price,
             'coupon_price': coupon_price,
             'discount_rate': discount_rate,
-            'crawl_time': crawl_time
+            'crawl_time': crawl_time,
+            'delivery' : delivery
         }
 
         # 카테고리 코드와 카테고리 ID 매핑 딕셔너리
@@ -203,16 +244,16 @@ def crawl_product_data(url):
             # 상품이 없는 경우에만 새로운 상품을 데이터베이스에 추가
             print("존재하지않음")
             add_product_query = """
-                INSERT INTO product (title, prod_option, description, img_url, url, category_id, brand_id)
-                VALUES (%(title)s, %(option)s, %(description)s, %(img_url)s, %(url)s, %(category_id)s, %(brand_id)s)
+                INSERT INTO product (title, prod_option, description, rating, img_url, url, category_id, brand_id)
+                VALUES (%(title)s, %(option)s, %(description)s, %(rating)s, %(img_url)s, %(url)s, %(category_id)s, %(brand_id)s)
             """
             cursor.execute(add_product_query, data)
             product_id = cursor.lastrowid
 
         # 가격 테이블에 데이터 삽입
         add_price_query = """
-            INSERT INTO price (origin_price, sale_price, coupon_price, discount_rate, crawl_time, product_id)
-            VALUES (%(origin_price)s, %(sale_price)s, %(coupon_price)s, %(discount_rate)s, %(crawl_time)s, %(product_id)s)
+            INSERT INTO price (origin_price, sale_price, coupon_price, discount_rate, crawl_time, delivery, product_id)
+            VALUES (%(origin_price)s, %(sale_price)s, %(coupon_price)s, %(discount_rate)s, %(crawl_time)s, %(delivery)s, %(product_id)s)
         """
         data['product_id'] = product_id
         cursor.execute(add_price_query, data)

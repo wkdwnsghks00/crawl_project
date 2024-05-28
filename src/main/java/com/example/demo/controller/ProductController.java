@@ -1,5 +1,10 @@
 package com.example.demo.controller;
 
+import com.example.demo.DTO.BigCategoryPage;
+import com.example.demo.DTO.BrandPage;
+import com.example.demo.DTO.CategoryPage;
+import com.example.demo.DTO.MainPage;
+import com.example.demo.DTO.ProductPage;
 import com.example.demo.entity.Product;
 import com.example.demo.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,35 +21,46 @@ public class ProductController {
         this.productService = productService;
     }
 
-    @GetMapping("/{id}") /* 제품 ID로 개별 제품 조회 */
-    public Product getProductById(@PathVariable int id) {
-        return productService.getProductById(id);
-    }
+    @GetMapping("/")
+    public List<MainPage> getAllProducts() {
+        return productService.getAllProducts();
+    } /* ★메인 홈화면 (제품추천순 제품전체) */
 
-    @GetMapping("/category/{categoryId}")  /* 카테고리기반 제품 조회*/
-    public List<Product> getProductsByCategoryId(@PathVariable int categoryId) {
-        return productService.getProductsByCategoryId(categoryId);
-    }
-    /* 빅 카테고리기반 제품 조회*/
+
     @GetMapping("/bigcategory/{bigCategoryId}")
-    public List<Product> getProductsByBigCategoryId(@PathVariable int bigCategoryId) {
+    public List<BigCategoryPage> getProductsByBigCategoryId(@PathVariable int bigCategoryId) {
         return productService.getProductsByBigCategoryId(bigCategoryId);
-    }
-    /* 브랜드별 제품 조회*/
+    } /* 큰 카테고리 별 페이지 */
+
+    @GetMapping("/category/{categoryId}")
+    public List<CategoryPage> getProductsByCategoryId(@PathVariable int categoryId) {
+        return productService.getProductsByCategoryId(categoryId);
+    } /* 카테고리 별 페이지*/
+
+
     @GetMapping("/brand/{brandId}")
-    public List<Product> getProductsByBrandId(@PathVariable int brandId) {
+    public List<BrandPage> getProductsByBrandId(@PathVariable int brandId) {
         return productService.getProductsByBrandId(brandId);
-    }
+    } /* 브랜드별 페이지*/
+
+    @GetMapping("/{id}")
+    public ProductPage getProductById(@PathVariable int id) {
+        return productService.getProductById(id);
+    } /* 개별 제품 상세 페이지 */
+
+
+
+
+
+
+
 
     @GetMapping("/search") /* 제품 검색 */
     public List<Product> searchProducts(@RequestParam String keyword) {
         return productService.searchProducts(keyword);
     }
 
-    @GetMapping("/") /* 모든 제품 조회 */
-    public List<Product> getAllProducts() {
-        return productService.getAllProducts();
-    }
+
 
 
 }

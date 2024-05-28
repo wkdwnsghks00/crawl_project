@@ -1,5 +1,10 @@
 package com.example.demo.service;
 
+import com.example.demo.DTO.BigCategoryPage;
+import com.example.demo.DTO.BrandPage;
+import com.example.demo.DTO.CategoryPage;
+import com.example.demo.DTO.MainPage;
+import com.example.demo.DTO.ProductPage;
 import com.example.demo.entity.Product;
 import com.example.demo.mapper.ProductMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,28 +19,40 @@ public class ProductService {
         this.productMapper = productMapper;
     }
 
-    public Product getProductById(int id) { /* 제품 ID로 제품 조회 */
-        return productMapper.findProductById(id);
-    }
+    public List<MainPage> getAllProducts() {
+        return productMapper.findAllProducts();
+    } /* ★메인 홈화면 (제품추천순 제품전체) */
 
-    public List<Product> getProductsByCategoryId(int categoryId) { /* 카테고리기반 제품 조회 */
-        return productMapper.findProductsByCategoryId(categoryId);
-    }
-
-    public List<Product> getProductsByBigCategoryId(int bigCategoryId) { /* 빅 카테고리기반 제품 조회*/
+    public List<BigCategoryPage> getProductsByBigCategoryId(int bigCategoryId) {
         return productMapper.findProductsByBigCategoryId(bigCategoryId);
-    }
+    } /* 큰 카테고리 별 페이지 */
 
-    public List<Product> getProductsByBrandId(int brandId) { /* 브랜드별 제품 조회*/
+    public List<CategoryPage> getProductsByCategoryId(int categoryId) {
+        return productMapper.findProductsByCategoryId(categoryId);
+    } /* 카테고리 별 페이지 */
+
+    public List<BrandPage> getProductsByBrandId(int brandId) {
         return productMapper.findProductsByBrandId(brandId);
-    }
+    } /* 브랜드별 페이지*/
+
+    public ProductPage getProductById(int id) {
+        return productMapper.findProductById(id);
+    } /* 개별 제품 상세 페이지 */
+
+
+
+
+
+
+
+
+
+
 
     public List<Product> searchProducts(String keyword) { /* 제품 검색 */
         return productMapper.searchProducts(keyword);
     } /* 제품 검색 기능*/
 
-    public List<Product> getAllProducts() { /* 모든 제품 조회 */
-        return productMapper.findAllProducts();
-    } /* 전체 제품 목록 조회 */
+
 
 }
