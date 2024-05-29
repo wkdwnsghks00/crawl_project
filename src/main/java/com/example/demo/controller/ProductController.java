@@ -48,19 +48,4 @@ public class ProductController {
         return productService.getProductById(id);
     } /* 개별 제품 상세 페이지 */
 
-
-
-
-
-
-
-
-    @GetMapping("/search") /* 제품 검색 */
-    public List<Product> searchProducts(@RequestParam String keyword) {
-        return productService.searchProducts(keyword);
-    }
-
-
-
-
 }

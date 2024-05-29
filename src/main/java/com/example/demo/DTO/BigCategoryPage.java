@@ -9,5 +9,4 @@ public class BigCategoryPage {
     private String title;
     private int coupon_price;
     private String discount_rate;
-    private float rating;
 }

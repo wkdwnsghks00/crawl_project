@@ -20,5 +20,4 @@ public class PriceController {
     public List<Price> getPricesByProductId(@PathVariable int productId) {
         return priceService.getPricesByProductId(productId);
     }
-
 }

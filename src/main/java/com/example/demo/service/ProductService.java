@@ -39,20 +39,4 @@ public class ProductService {
         return productMapper.findProductById(id);
     } /* 개별 제품 상세 페이지 */
 
-
-
-
-
-
-
-
-
-
-
-    public List<Product> searchProducts(String keyword) { /* 제품 검색 */
-        return productMapper.searchProducts(keyword);
-    } /* 제품 검색 기능*/
-
-
-
 }
