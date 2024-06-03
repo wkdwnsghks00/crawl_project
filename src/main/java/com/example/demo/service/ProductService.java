@@ -1,6 +1,5 @@
 package com.example.demo.service;
 
-import com.example.demo.DTO.BigCategoryPage;
 import com.example.demo.DTO.BrandPage;
 import com.example.demo.DTO.CategoryPage;
 import com.example.demo.DTO.MainPage;
@@ -23,17 +22,13 @@ public class ProductService {
         return productMapper.findAllProducts();
     } /* ★메인 홈화면 (제품추천순 제품전체) */
 
-    public List<BigCategoryPage> getProductsByBigCategoryId(int bigCategoryId) {
-        return productMapper.findProductsByBigCategoryId(bigCategoryId);
-    } /* 큰 카테고리 별 페이지 */
+//    public List<CategoryPage> getProductsByCategoryId(int categoryId) {
+//        return productMapper.findProductsByCategoryId(categoryId);
+//    } /* 카테고리 별 페이지 */
 
-    public List<CategoryPage> getProductsByCategoryId(int categoryId) {
-        return productMapper.findProductsByCategoryId(categoryId);
-    } /* 카테고리 별 페이지 */
-
-    public List<BrandPage> getProductsByBrandId(int brandId) {
-        return productMapper.findProductsByBrandId(brandId);
-    } /* 브랜드별 페이지*/
+//    public List<BrandPage> getProductsByBrandId(int brandId) {
+//        return productMapper.findProductsByBrandId(brandId);
+//    } /* 브랜드별 페이지*/
 
     public ProductPage getProductById(int id) {
         return productMapper.findProductById(id);

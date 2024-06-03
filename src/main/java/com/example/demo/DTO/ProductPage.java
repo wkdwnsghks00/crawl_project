@@ -23,4 +23,6 @@ public class ProductPage {
 
     //brand
     private String brand_name;
+
+    private int price_change_rate; // 추가된 필드
 }

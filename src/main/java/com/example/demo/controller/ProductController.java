@@ -1,6 +1,5 @@
 package com.example.demo.controller;
 
-import com.example.demo.DTO.BigCategoryPage;
 import com.example.demo.DTO.BrandPage;
 import com.example.demo.DTO.CategoryPage;
 import com.example.demo.DTO.MainPage;
@@ -27,21 +26,16 @@ public class ProductController {
     } /* ★메인 홈화면 (제품추천순 제품전체) */
 
 
-    @GetMapping("/bigcategory/{bigCategoryId}")
-    public List<BigCategoryPage> getProductsByBigCategoryId(@PathVariable int bigCategoryId) {
-        return productService.getProductsByBigCategoryId(bigCategoryId);
-    } /* 큰 카테고리 별 페이지 */
-
-    @GetMapping("/category/{categoryId}")
-    public List<CategoryPage> getProductsByCategoryId(@PathVariable int categoryId) {
-        return productService.getProductsByCategoryId(categoryId);
-    } /* 카테고리 별 페이지*/
+//    @GetMapping("/category/{categoryId}")
+//    public List<CategoryPage> getProductsByCategoryId(@PathVariable int categoryId) {
+//        return productService.getProductsByCategoryId(categoryId);
+//    } /* 카테고리 별 페이지*/
 
 
-    @GetMapping("/brand/{brandId}")
-    public List<BrandPage> getProductsByBrandId(@PathVariable int brandId) {
-        return productService.getProductsByBrandId(brandId);
-    } /* 브랜드별 페이지*/
+//    @GetMapping("/brand/{brandId}")
+//    public List<BrandPage> getProductsByBrandId(@PathVariable int brandId) {
+//        return productService.getProductsByBrandId(brandId);
+//    } /* 브랜드별 페이지*/
 
     @GetMapping("/{id}")
     public ProductPage getProductById(@PathVariable int id) {

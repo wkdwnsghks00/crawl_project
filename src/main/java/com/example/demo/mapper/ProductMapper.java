@@ -1,5 +1,5 @@
 package com.example.demo.mapper;
-import com.example.demo.DTO.BigCategoryPage;
+
 import com.example.demo.DTO.BrandPage;
 import com.example.demo.DTO.CategoryPage;
 import com.example.demo.DTO.MainPage;
@@ -19,50 +19,60 @@ import org.apache.ibatis.annotations.Update;
 
 @Mapper
 public interface ProductMapper {
-    @Select("SELECT p.img_url, b.name AS brand_name, p.title, pr.coupon_price, pr.discount_rate " +
+    @Select("WITH LatestPrices AS ( " +
+        "    SELECT product_id, coupon_price AS latest_price, discount_rate, delivery, origin_price, sale_price, crawl_time, " +
+        "           ROW_NUMBER() OVER (PARTITION BY product_id ORDER BY crawl_time DESC) AS rn " +
+        "    FROM price " +
+        "), " +
+        "PreviousPrices AS ( " +
+        "    SELECT product_id, coupon_price AS previous_price, crawl_time, " +
+        "           ROW_NUMBER() OVER (PARTITION BY product_id ORDER BY crawl_time DESC) AS rn " +
+        "    FROM price " +
+        ") " +
+        "SELECT p.id, p.img_url, b.name AS brand_name, p.title, p.prod_option, p.description, p.rating, p.url, p.category_id, p.brand_id, " +
+        "       pr1.latest_price AS coupon_price, pr1.discount_rate, pr1.delivery, pr1.origin_price, pr1.sale_price, " +
+        "       ((pr1.latest_price - pr2.previous_price) / pr2.previous_price) * 100 AS price_change_rate " +
         "FROM product p " +
-        "JOIN (SELECT * FROM price ORDER BY crawl_time DESC) pr ON p.id = pr.product_id " +
+        "JOIN LatestPrices pr1 ON p.id = pr1.product_id AND pr1.rn = 1 " +
+        "JOIN PreviousPrices pr2 ON p.id = pr2.product_id AND pr2.rn = 2 " +
         "JOIN brand b ON p.brand_id = b.id " +
-        "GROUP BY p.id, p.img_url, b.name, p.title, pr.coupon_price, pr.discount_rate " +
-        //"ORDER BY CAST(REPLACE(pr.discount_rate, '%', '') AS UNSIGNED) DESC " + // 할인순 정렬
-        "LIMIT 60") // 상위 60개만 가져오기
+        "ORDER BY price_change_rate ASC ")
     List<MainPage> findAllProducts(); /* ★메인 홈화면 (제품추천순 제품전체) */
 
+//    @Select("WITH LatestPrices AS ( " +
+//        "    SELECT product_id, coupon_price AS latest_price, discount_rate, delivery, origin_price, sale_price, crawl_time, " +
+//        "           ROW_NUMBER() OVER (PARTITION BY product_id ORDER BY crawl_time DESC) AS rn " +
+//        "    FROM price " +
+//        "), " +
+//        "PreviousPrices AS ( " +
+//        "    SELECT product_id, coupon_price AS previous_price, crawl_time, " +
+//        "           ROW_NUMBER() OVER (PARTITION BY product_id ORDER BY crawl_time DESC) AS rn " +
+//        "    FROM price " +
+//        ") " +
+//        "SELECT p.id, p.img_url, b.name AS brand_name, p.title, p.prod_option, p.description, p.rating, p.url, p.category_id, p.brand_id, " +
+//        "       pr1.latest_price AS coupon_price, pr1.discount_rate, pr1.delivery, pr1.origin_price, pr1.sale_price, " +
+//        "       ((pr2.previous_price - pr1.latest_price) / pr2.previous_price) * 100 AS price_change_rate " +
+//        "FROM product p " +
+//        "JOIN LatestPrices pr1 ON p.id = pr1.product_id AND pr1.rn = 1 " +
+//        "JOIN PreviousPrices pr2 ON p.id = pr2.product_id AND pr2.rn = 2 " +
+//        "JOIN brand b ON p.brand_id = b.id " +
+//        "WHERE p.category_id = #{categoryId} " +
+//        "ORDER BY price_change_rate DESC")
+//    List<CategoryPage> findProductsByCategoryId(int categoryId); /* 카테고리별 페이지 */
 
-
-    @Select("SELECT p.img_url, b.name AS brand_name, p.title, pr.coupon_price, pr.discount_rate " +
-        "FROM product p " +
-        "JOIN (SELECT * FROM price ORDER BY crawl_time DESC) pr ON p.id = pr.product_id " +
-        "JOIN brand b ON p.brand_id = b.id " +
-        "JOIN category c ON p.category_id = c.id " +
-        "WHERE c.bigcategory_id = #{bigCategoryId} " +
-        "GROUP BY p.id, p.img_url, b.name, p.title, pr.coupon_price, pr.discount_rate " +
-        //"ORDER BY CAST(REPLACE(pr.discount_rate, '%', '') AS UNSIGNED) DESC "+ // 할인순 정렬
-        "LIMIT 60") // 상위 60개만 가져오기
-    List<BigCategoryPage> findProductsByBigCategoryId(int bigCategoryId); /* 큰 카테고리 별 페이지 */
-
-
-    @Select("SELECT p.img_url, b.name AS brand_name, p.title, pr.coupon_price, pr.discount_rate " +
-        "FROM product p " +
-        "JOIN (SELECT * FROM price ORDER BY crawl_time DESC) pr ON p.id = pr.product_id " +
-        "JOIN brand b ON p.brand_id = b.id " +
-        "WHERE p.category_id = #{categoryId} " +
-        "GROUP BY p.id, p.img_url, b.name, p.title, pr.coupon_price, pr.discount_rate " +
-        //"ORDER BY CAST(REPLACE(pr.discount_rate, '%', '') AS UNSIGNED) DESC "+ // 할인순 정렬
-        "LIMIT 60") // 상위 60개만 가져오기
-    List<CategoryPage> findProductsByCategoryId(int categoryId); /* 카테고리별 페이지 */
-
-
-    @Select("SELECT p.img_url, b.name AS brand_name, p.title, pr.coupon_price, pr.discount_rate " +
-        "FROM product p " +
-        "JOIN (SELECT * FROM price ORDER BY crawl_time DESC) pr ON p.id = pr.product_id " +
-        "JOIN brand b ON p.brand_id = b.id " +
-        "WHERE p.brand_id = #{brandId} " +
-        "GROUP BY p.id, p.img_url, b.name, p.title, pr.coupon_price, pr.discount_rate " +
-        //"ORDER BY CAST(REPLACE(pr.discount_rate, '%', '') AS UNSIGNED) DESC "+ // 할인순 정렬
-        "LIMIT 60") // 상위 60개만 가져오기
-    List<BrandPage> findProductsByBrandId(int brandId); /* 브랜드별 페이지 */
-
+//    @Select("SELECT p.id, p.img_url, b.name AS brand_name, p.title, p.prod_option, p.description, p.rating, p.url, p.category_id, p.brand_id, " +
+//        "pr.coupon_price, pr.discount_rate, pr.origin_price, pr.sale_price, pr.delivery " +
+//        "FROM product p " +
+//        "JOIN (SELECT product_id, coupon_price, discount_rate, origin_price, sale_price, delivery " +
+//        "      FROM price " +
+//        "      WHERE (product_id, crawl_time) IN " +
+//        "            (SELECT product_id, MAX(crawl_time) " +
+//        "             FROM price " +
+//        "             GROUP BY product_id)) pr ON p.id = pr.product_id " +
+//        "JOIN brand b ON p.brand_id = b.id " +
+//        "WHERE p.brand_id = #{brandId} " +
+//        "ORDER BY CAST(REPLACE(pr.discount_rate, '%', '') AS DECIMAL) DESC ")
+//    List<BrandPage> findProductsByBrandId(int brandId); /* 브랜드별 페이지 */
 
     @Select("SELECT p.id, p.title, p.prod_option, p.description, p.rating, p.img_url, p.url, p.category_id, p.brand_id, " +
         "pr.origin_price, pr.sale_price, pr.coupon_price, pr.discount_rate, pr.delivery, " +
