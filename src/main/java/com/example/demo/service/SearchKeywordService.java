@@ -2,10 +2,11 @@ package com.example.demo.service;
 
 import com.example.demo.entity.SearchKeyword;
 import com.example.demo.mapper.SearchKeywordMapper;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.time.LocalDate;
 
 @Service
 public class SearchKeywordService {
@@ -17,18 +18,20 @@ public class SearchKeywordService {
         this.searchKeywordMapper = searchKeywordMapper;
     }
 
-    public List<SearchKeyword> getTopSearchKeywords(int limit) {
-        return searchKeywordMapper.getTopSearchKeywords(limit);
-    } /* 매퍼를 호출하여 카운트가 높은 순으로 정렬된 검색어 목록 가져오기 */
-
-    public void addOrUpdateKeyword(String keyword) {
-        SearchKeyword searchKeyword = searchKeywordMapper.findKeyword(keyword);
-        if (searchKeyword == null) {
-            searchKeyword = new SearchKeyword();
-            searchKeyword.setKeyword(keyword);
-            searchKeywordMapper.insertKeyword(searchKeyword);
+    public void saveOrUpdateKeyword(String keyword) {
+        SearchKeyword existingKeyword = searchKeywordMapper.findByKeywordAndDate(keyword); // 오늘 날짜의 특정 검색어를 조회합니다.
+        if (existingKeyword != null) {
+            searchKeywordMapper.incrementCount(existingKeyword.getId()); // 새로운 검색어 객체를 생성합니다.
         } else {
-            searchKeywordMapper.incrementCount(searchKeyword.getId());
+            SearchKeyword newKeyword = new SearchKeyword(); // 새로운 검색어 객체를 생성합니다.
+            newKeyword.setKeyword(keyword); // 검색어를 설정합니다.
+            newKeyword.setCount(1); // 카운트를 1로 설정합니다.
+            newKeyword.setDate(LocalDate.now()); // 오늘 날짜를 설정합니다.
+            searchKeywordMapper.insert(newKeyword); // 검색어를 테이블에 삽입합니다.
         }
-    } /* 검색어를 데이터베이스에 저장하거나, 이미 존재하는 검색어라면 해당 검색어의 카운트 증가 */
+    }
+
+    public List<SearchKeyword> getPopularKeywords() {
+        return searchKeywordMapper.findAllOrderByCount(); // 오늘 날짜의 인기 검색어를 조회합니다.
+    }
 }

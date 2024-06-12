@@ -14,6 +14,7 @@ public class MainPage {
     private int coupon_price;
     private String discount_rate;
     private String delivery;
+    private int review_count;
 
     private String prod_option;
     private String description;

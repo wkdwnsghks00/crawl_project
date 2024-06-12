@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.entity.DailyPriceSummary;
 import com.example.demo.entity.Price;
 import com.example.demo.mapper.PriceMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,5 +20,8 @@ public class PriceService {
         return priceMapper.findPricesByProductId(productId);
     }
 
+    public List<DailyPriceSummary> getDailyPriceSummary(int product_id) {
+        return priceMapper.getDailyPriceSummary(product_id);
+    }
 }
 

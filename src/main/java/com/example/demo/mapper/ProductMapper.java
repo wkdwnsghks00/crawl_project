@@ -19,10 +19,15 @@ import org.apache.ibatis.annotations.Update;
 
 @Mapper
 public interface ProductMapper {
-    @Select("WITH LatestPrices AS ( " +
-        "    SELECT product_id, coupon_price AS latest_price, discount_rate, delivery, origin_price, sale_price, crawl_time, " +
+    @Select("WITH LatestHour AS ( " +
+        "    SELECT DATE_FORMAT(MAX(crawl_time), '%Y-%m-%d %H:00:00') AS latest_hour " +
+        "    FROM price " +
+        "), " +
+        "LatestPrices AS ( " +
+        "    SELECT product_id, coupon_price AS latest_price, discount_rate, delivery, origin_price, sale_price, crawl_time, review_count, " +
         "           ROW_NUMBER() OVER (PARTITION BY product_id ORDER BY crawl_time DESC) AS rn " +
         "    FROM price " +
+        "    WHERE DATE_FORMAT(crawl_time, '%Y-%m-%d %H:00:00') = (SELECT latest_hour FROM LatestHour) " +
         "), " +
         "PreviousPrices AS ( " +
         "    SELECT product_id, coupon_price AS previous_price, crawl_time, " +
@@ -30,14 +35,15 @@ public interface ProductMapper {
         "    FROM price " +
         ") " +
         "SELECT p.id, p.img_url, b.name AS brand_name, p.title, p.prod_option, p.description, p.rating, p.url, p.category_id, p.brand_id, " +
-        "       pr1.latest_price AS coupon_price, pr1.discount_rate, pr1.delivery, pr1.origin_price, pr1.sale_price, " +
+        "       pr1.latest_price AS coupon_price, pr1.discount_rate, pr1.delivery, pr1.origin_price, pr1.sale_price, pr1.review_count, " +
         "       ROUND(((pr1.latest_price - pr2.previous_price) / pr2.previous_price) * 100, 1) AS price_change_rate " +
         "FROM product p " +
         "JOIN LatestPrices pr1 ON p.id = pr1.product_id AND pr1.rn = 1 " +
         "JOIN PreviousPrices pr2 ON p.id = pr2.product_id AND pr2.rn = 2 " +
         "JOIN brand b ON p.brand_id = b.id " +
-        "ORDER BY price_change_rate ASC ")
-    List<MainPage> findAllProducts(); /* ★메인 홈화면 (제품추천순 제품전체) */
+        "ORDER BY price_change_rate ASC")
+    List<MainPage> findAllProducts();
+    /* ★메인 홈화면 (제품추천순 제품전체) */
 
 
 //    @Select("WITH LatestPrices AS ( " +

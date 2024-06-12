@@ -18,13 +18,13 @@ public class SearchKeywordController {
         this.searchKeywordService = searchKeywordService;
     }
 
-    @GetMapping("/top")
-    public List<SearchKeyword> getTopSearchKeywords(@RequestParam int limit) {
-        return searchKeywordService.getTopSearchKeywords(limit);
-    } /* 서비스 레이어에서 인기 검색어 목록 받아 클라이언트로 반환 */
+    @PostMapping
+    public void addKeyword(@RequestBody String keyword) {
+        searchKeywordService.saveOrUpdateKeyword(keyword); // 검색어를 추가하거나 업데이트합니다.
+    }
 
-    @PostMapping("/add")
-    public void addKeyword(@RequestParam String keyword) {
-        searchKeywordService.addOrUpdateKeyword(keyword);
-    } /* 검색어 받아 서비스 레이어로 전달*/
+    @GetMapping
+    public List<SearchKeyword> getPopularKeywords() {
+        return searchKeywordService.getPopularKeywords(); // 오늘 날짜의 인기 검색어를 조회합니다.
+    }
 }
