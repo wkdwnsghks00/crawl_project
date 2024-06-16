@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.DTO.SearchKeywordDTO;
 import com.example.demo.entity.SearchKeyword;
 import com.example.demo.service.SearchKeywordService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +20,9 @@ public class SearchKeywordController {
     }
 
     @PostMapping
-    public void addKeyword(@RequestBody String keyword) {
-        searchKeywordService.saveOrUpdateKeyword(keyword); // 검색어를 추가하거나 업데이트합니다.
+    public void addKeyword(@RequestBody SearchKeywordDTO searchKeywordDTO) {
+        String keyword = searchKeywordDTO.getKeyword(); // 검색어만 추출
+        searchKeywordService.saveOrUpdateKeyword(keyword); // 검색어를 추가하거나 업데이트
     }
 
     @GetMapping
