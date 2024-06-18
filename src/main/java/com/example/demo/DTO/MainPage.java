@@ -24,5 +24,6 @@ public class MainPage {
     private int brand_id;
 
     private int price_change_rate; // 추가된 필드
+    private boolean isLowestPrice; // 역대 최저가 여부 추가
 
 }

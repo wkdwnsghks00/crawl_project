@@ -3,6 +3,8 @@ package com.example.demo.controller;
 import com.example.demo.entity.User;
 import com.example.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -24,12 +26,12 @@ public class UserController {
 
     // 로그인
     @PostMapping("/login")
-    public String loginUser(@RequestBody User user) {
+    public ResponseEntity<String> loginUser(@RequestBody User user) {
         boolean isValidUser = userService.validateUserCredentials(user.getId(), user.getPassword());
         if (isValidUser) {
-            return "Login successful!";
+            return ResponseEntity.ok("Login successful!");
         } else {
-            return "Invalid username or password!";
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password!");
         }
     }
 

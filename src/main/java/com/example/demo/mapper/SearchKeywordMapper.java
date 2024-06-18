@@ -21,6 +21,7 @@ public interface SearchKeywordMapper {
     @Select("SELECT keyword, count FROM search_keyword WHERE date = CURRENT_DATE ORDER BY count DESC")
     List<SearchKeyword> findAllOrderByCount(); // 오늘 날짜의 검색어를 카운트 순으로 정렬하여 조회합니다.
 
-    @Update("UPDATE search_keyword SET count = 0 WHERE date < CURRENT_DATE")
-    void resetKeywordCounts(); // 하루가 지나면 검색어 카운트를 0으로 초기화합니다.
+    // 기존 데이터 삭제 메서드
+    @Delete("DELETE FROM search_keyword WHERE date < CURRENT_DATE")
+    void deleteOldKeywords(); // 날짜가 지난 검색어를 삭제합니다.
 }

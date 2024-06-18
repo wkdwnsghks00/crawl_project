@@ -4,6 +4,7 @@ import com.example.demo.entity.SearchKeyword;
 import com.example.demo.mapper.SearchKeywordMapper;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -33,5 +34,10 @@ public class SearchKeywordService {
 
     public List<SearchKeyword> getPopularKeywords() {
         return searchKeywordMapper.findAllOrderByCount(); // 오늘 날짜의 인기 검색어를 조회합니다.
+    }
+
+    @Scheduled(cron = "0 0 0 * * *") // 매일 자정에 실행
+    public void deleteOldKeywords() {
+        searchKeywordMapper.deleteOldKeywords();
     }
 }
