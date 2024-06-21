@@ -12,3 +12,8 @@ spring:
 
 mybatis:
   type-aliases-package: com.example.demo.entity
+# application.yml
+jwt:
+  secret: your_secret_key
+  expiration: 3600000  # 1 hour
+
